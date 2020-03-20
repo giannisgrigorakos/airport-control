@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -21,18 +22,18 @@
             <Label alignment="CENTER" layoutX="334.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Parking Space:" textFill="WHITE" />
             <Label alignment="CENTER" layoutX="123.0" layoutY="97.0" prefHeight="33.0" prefWidth="263.0" style="-fx-background-color: #0d47a1#0d47a1;" text="No. of Flights Departing in 10 next minutes: " textFill="WHITE" />
             <Label alignment="CENTER" layoutX="587.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Revenue: " textFill="WHITE" />
-            <Label alignment="CENTER" layoutX="418.0" layoutY="97.0" prefHeight="33.0" prefWidth="245.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total TIme Ellapsed:" textFill="WHITE" />
+            <Label fx:id="timerLabel" alignment="CENTER" layoutX="418.0" layoutY="97.0" prefHeight="33.0" prefWidth="245.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total TIme Ellapsed:" textFill="WHITE" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="27.0" layoutY="230.0" prefHeight="160.0" prefWidth="402.0" style="-fx-background-color: #ffffff;">
          <children>
             <Label fx:id="gate" alignment="CENTER" layoutX="13.0" layoutY="14.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Gate:  N/A" textFill="WHITE" />
-            <Label fx:id="freight_gate" alignment="CENTER" layoutX="14.0" layoutY="64.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Freight Gate: N/A" textFill="WHITE" />
+            <Label fx:id="freightGate" alignment="CENTER" layoutX="14.0" layoutY="64.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Freight Gate: N/A" textFill="WHITE" />
             <Label fx:id="general" alignment="CENTER" layoutX="96.0" layoutY="113.0" prefHeight="33.0" prefWidth="217.0" style="-fx-background-color: #0d47a1#0d47a1;" text=" General Parcking Space: N/A" textFill="WHITE" />
-            <Label fx:id="zone_a" alignment="CENTER" layoutX="142.0" layoutY="14.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Zone A:  N/A" textFill="WHITE" />
-            <Label fx:id="zone_c" alignment="CENTER" layoutX="142.0" layoutY="64.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Zone C:  N/A" textFill="WHITE" />
-            <Label fx:id="long_term" alignment="CENTER" layoutX="269.0" layoutY="64.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Long Term:  N/A" textFill="WHITE" />
-            <Label fx:id="zone_b" alignment="CENTER" layoutX="269.0" layoutY="14.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Zone B:  N/A" textFill="WHITE" />
+            <Label fx:id="zoneA" alignment="CENTER" layoutX="142.0" layoutY="14.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Zone A:  N/A" textFill="WHITE" />
+            <Label fx:id="zoneC" alignment="CENTER" layoutX="142.0" layoutY="64.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Zone C:  N/A" textFill="WHITE" />
+            <Label fx:id="longTerm" alignment="CENTER" layoutX="269.0" layoutY="64.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Long Term:  N/A" textFill="WHITE" />
+            <Label fx:id="zoneB" alignment="CENTER" layoutX="269.0" layoutY="14.0" prefHeight="33.0" prefWidth="114.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Zone B:  N/A" textFill="WHITE" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="27.0" layoutY="407.0" prefHeight="160.0" prefWidth="808.0" style="-fx-background-color: #ffffff;">
@@ -42,7 +43,8 @@
       </AnchorPane>
       <AnchorPane layoutX="434.0" layoutY="230.0" prefHeight="160.0" prefWidth="402.0" style="-fx-background-color: #ffffff;">
          <children>
-            <JFXTextField alignment="CENTER" layoutX="86.0" layoutY="67.0" prefHeight="27.0" prefWidth="230.0" promptText="Insert Flight to Dock" />
+            <JFXTextField fx:id="newFlight" alignment="CENTER" layoutX="86.0" layoutY="40.0" prefHeight="27.0" prefWidth="230.0" promptText="Insert Flight to Dock" />
+            <JFXButton fx:id="addFlight" layoutX="156.0" layoutY="80.0" prefHeight="27.0" prefWidth="90.0" style="-fx-background-color: #0d47a1#0d47a1 #0d47a1#0d47a1;" text="Add Flight" textFill="WHITE" />
          </children>
       </AnchorPane>
       <MenuBar fx:id="menuBar" layoutX="27.0" layoutY="17.0" prefHeight="29.0" prefWidth="154.0">
@@ -54,13 +56,13 @@
               <MenuItem fx:id="exitMenuItem" mnemonicParsing="false" text="Exit" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Details">
+          <Menu fx:id="detailsMenu" mnemonicParsing="false" text="Details">
             <items>
-                  <MenuItem mnemonicParsing="false" text="Details" />
-                  <MenuItem mnemonicParsing="false" text="Flights" />
-                  <MenuItem mnemonicParsing="false" text="Delayed" />
-                  <MenuItem mnemonicParsing="false" text="Holding" />
-              <MenuItem mnemonicParsing="false" text="Next Departures" />
+                  <MenuItem fx:id="gates" mnemonicParsing="false" text="Gates" />
+                  <MenuItem fx:id="flights" mnemonicParsing="false" text="Flights" />
+                  <MenuItem fx:id="delayed" mnemonicParsing="false" text="Delayed" />
+                  <MenuItem fx:id="holding" mnemonicParsing="false" text="Holding" />
+              <MenuItem fx:id="nextDepartures" mnemonicParsing="false" text="Next Departures" />
             </items>
           </Menu>
         </menus>

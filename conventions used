@@ -1,0 +1,9 @@
+1. See Constants
+2. We need a dock_time for each flight in order to free the parking spot as soon as the plane leaves.
+This dock_time exists in each gate and is an array of times. So e.g when the current time is 100 (in seconds)
+and the departure of a flight is 80 that means that in the 180th second we have a departure so we have to free that spot.
+This conditions will be checked every second.
+
+
+
+ToDO -> finish departure logic
