@@ -3,7 +3,7 @@
 This dock_time exists in each gate and is an array of times. So e.g when the current time is 100 (in seconds)
 and the departure of a flight is 80 that means that in the 180th second we have a departure so we have to free that spot.
 This conditions will be checked every second.
+3. In every gate there is a hast tables that maps a flight id with it's estimated departure time ( HashTable < flight_id, departure_time > )
+4. To popup window will be implemented with TableView. In order to minimize the popup you have to click to the slightly gray area.
 
-
-
-ToDO -> finish departure logic
+ToDO -> Make Details Menu Buttons
