@@ -52,14 +52,14 @@ public class PopUpHoldingFlights {
     }
 
 
-    public static TableView<PopUpHoldingFlights> setNextDeparturesForPopUp(List<List<String>> flightLedger) {
+    public static TableView<PopUpHoldingFlights> setHoldingFlightsForPopUp(List<List<String>> flightLedger) {
 
         TableView<PopUpHoldingFlights> table = new TableView<>();
 
         ObservableList<PopUpHoldingFlights> data = FXCollections.observableArrayList();
 
         for (List<String> list : flightLedger) {
-            data.add(new PopUpHoldingFlights(list.get(0), list.get(2), list.get(3), list.get(5)));
+            data.add(new PopUpHoldingFlights(list.get(0), list.get(2), list.get(3), list.get(7)));
         }
 
         TableColumn flightIdCol = new TableColumn("Flight Id");

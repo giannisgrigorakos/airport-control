@@ -10,8 +10,12 @@ This conditions will be checked every second.
 
 
 ToDO -> Make Details Menu Buttons
-prepei na tsekarw an xreiazomai to hashtable giati exw race condition sto check departures kai sto checkforPending flights
-    -> mia lush fainetai na einai na xrhshmopoihsw to ledger. To mono thema pou uparxei einai sto show gates. Isws na emfanizw pali apo to ledger kai na
-    tsekarw an exei to anagnwristiko ths pulhs sto prwto gramma tou whereParcked sto ledger.
+Na tsekarw an mpainei panta to prwto stoixeio otan einai se fash holding (exw thn entupwsh oti ginetai mono tou)
+Na ftiaksw to load button
+timologhsh
+Na ftiaksw ta aeroplana na feugoun opote nanai -> dunamikh timologhsh
+Na ftiaksw to delayed button
+Na ftiaksw tis arxikes pthseis na ksekinane apo parked
+Diagrafw tis departed apo ledger??
 
-    an den prolabainw fainetai na mhn uparxei thema.
+Improvements sto insertFlight exw axrhsta pedia

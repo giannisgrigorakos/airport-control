@@ -111,7 +111,7 @@ public class MenuController extends Main {
              consts = new Constants();
             //initialize timer/////////////////////////////////////////////
             Timeline timeline = new Timeline(new KeyFrame(
-                    Duration.millis(100),
+                    Duration.millis(1000),
                     ae -> increaseTimer()));
             timeline.setCycleCount(Animation.INDEFINITE);
             timeline.play();
@@ -239,111 +239,46 @@ public class MenuController extends Main {
         timerLabel.setText("Total Time Ellapsed  " + this.hours + " : " + (this.seconds-(3600*this.hours))/60);
         checkForDepartures();
         checkForPendingFlights();
+        checkForStateChanges();
 
     }
 
     public void checkForDepartures() {
 
-        // Getting an individual iterator foe every gate
-        Iterator hmIterator;
-        hmIterator = consts.gateFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.gateFlights.remove(mapElement.getKey());
-                consts.gateCurrentCapacity--;
-                gate.setText("Gate: " + consts.gateCurrentCapacity + " / " + consts.gateMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-
-        hmIterator = consts.freightGateFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.freightGateFlights.remove(mapElement.getKey());
-                consts.freightGateCurrentCapacity--;
-                freightGate.setText("Freight Gate: " + consts.freightGateCurrentCapacity + " / " + consts.freightGateMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-
-        hmIterator = consts.zoneAFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.zoneAFlights.remove(mapElement.getKey());
-                consts.zoneACurrentCapacity--;
-                zoneA.setText("Zone A: " + consts.zoneACurrentCapacity + " / " + consts.zoneAMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-
-        hmIterator = consts.zoneBFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.zoneBFlights.remove(mapElement.getKey());
-                consts.zoneBCurrentCapacity--;
-                zoneB.setText("Zone B: " + consts.zoneBCurrentCapacity + " / " + consts.zoneBMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-
-        hmIterator = consts.zoneCFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.zoneCFlights.remove(mapElement.getKey());
-                consts.zoneCCurrentCapacity--;
-                zoneC.setText("Zone C: " + consts.zoneCCurrentCapacity + " / " + consts.zoneCMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-
-        hmIterator = consts.generalFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.generalFlights.remove(mapElement.getKey());
-                consts.generalCurrentCapacity--;
-                general.setText("General Parking Space: " + consts.generalCurrentCapacity + " / " + consts.generalMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-
-        hmIterator = consts.longTermFlights.entrySet().iterator();
-        while (hmIterator.hasNext()) {
-            Map.Entry mapElement = (Map.Entry)hmIterator.next();
-            if(mapElement.getValue().equals(this.seconds)) {
-                consts.longTermFlights.remove(mapElement.getKey());
-                consts.longTermCurrentCapacity--;
-                longTerm.setText("Long Term: " + consts.longTermCurrentCapacity + " / " + consts.longTermMaxCapacity);
-                //update the flightLedger for this departure
-                updateFlightLedger(mapElement);
-                announcements.setText("Flight with id: " + mapElement.getKey() +" has just departed.");
-            }
-        }
-    }
-
-    private void updateFlightLedger(Map.Entry mapElement) {
         Iterator<List<String>> itr = ledger.flightLedger.iterator();
         while (itr.hasNext()) {
-            List<String> toBeRemoved = itr.next();
-            if (toBeRemoved.get(0).equals(mapElement.getKey())) {
+            List<String> flight = itr.next();
+            if (flight.get(5).equals("Parked") && Integer.parseInt(flight.get(6)) == this.seconds) {
                 itr.remove();
+                if(flight.get(9).equals("gate")) {
+                    consts.gateCurrentCapacity--;
+                    gate.setText("Gate: " + consts.gateCurrentCapacity + " / " + consts.gateMaxCapacity);
+                }
+                else if (flight.get(9).equals("freightGate")) {
+                    consts.freightGateCurrentCapacity--;
+                    freightGate.setText("Freight Gate: " + consts.freightGateCurrentCapacity + " / " + consts.freightGateMaxCapacity);
+                }
+                else if (flight.get(9).equals("zoneA")) {
+                    consts.zoneACurrentCapacity--;
+                    zoneA.setText("Zone A: " + consts.zoneACurrentCapacity + " / " + consts.zoneAMaxCapacity);
+                }
+                else if (flight.get(9).equals("zoneB")) {
+                    consts.zoneBCurrentCapacity--;
+                    zoneB.setText("Zone B: " + consts.zoneBCurrentCapacity + " / " + consts.zoneBMaxCapacity);
+                }
+                else if (flight.get(9).equals("zoneC")) {
+                    consts.zoneCCurrentCapacity--;
+                    zoneC.setText("Zone C: " + consts.zoneCCurrentCapacity + " / " + consts.zoneCMaxCapacity);
+                }
+                else if (flight.get(9).equals("general")) {
+                    consts.generalCurrentCapacity--;
+                    general.setText("General Parking Space: " + consts.generalCurrentCapacity + " / " + consts.generalMaxCapacity);
+                }
+                else if (flight.get(9).equals("longTerm")) {
+                    consts.longTermCurrentCapacity--;
+                    longTerm.setText("Long Term: " + consts.longTermCurrentCapacity + " / " + consts.longTermMaxCapacity);
+                }
+                announcements.setText("Flight with id: " + flight.get(0) +" has just departed.");
             }
         }
     }
@@ -360,18 +295,37 @@ public class MenuController extends Main {
 
         //initialize a new flight in order to add it in our ledger
         List<String> newFlight = new ArrayList<>();
-        newFlight.add(flight.get(0));
-        newFlight.add(flight.get(1));
-        newFlight.add(flight.get(2));
-        newFlight.add(flight.get(3));
+        //flightId
+        newFlight.add(flight.get(0).trim());
+        //city
+        newFlight.add(flight.get(1).trim());
+        //flightType
+        newFlight.add(flight.get(2).trim());
+        //planeType
+        newFlight.add(flight.get(3).trim());
+        //whereParked
         newFlight.add("");
+        //currentState
         newFlight.add("Holding");
+        //departureTime
         newFlight.add("");
+        //firstContact
         newFlight.add(Integer.toString(this.seconds));
+        //timeParked
         newFlight.add(flight.get(4).trim());
+        //gateParked
+        newFlight.add("");
+        //timeToLand
+        if(newFlight.get(3).equals("1"))
+            newFlight.add("6");
+        else if(newFlight.get(3).equals("2"))
+            newFlight.add("4");
+        else if(newFlight.get(3).equals("3"))
+            newFlight.add("2");
+        //timeItStartsLanding
+        newFlight.add("");
 
         Boolean hasParked = false;
-        String flight_id = flight.get(0).trim();
         String flightType = flight.get(2).trim();
         String planeType = flight.get(3).trim();
         int landingTime = Integer.parseInt(flight.get(4).trim());
@@ -379,18 +333,21 @@ public class MenuController extends Main {
         if(consts.gateCurrentCapacity < consts.gateMaxCapacity && !hasParked) {
             if(!consts.gateFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.gateAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.gateMaxTime >= landingTime) {
+                    if(consts.gateMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.gateCurrentCapacity++;
                         gate.setText("Gate: " + consts.gateCurrentCapacity + " / " + consts.gateMaxCapacity);
-                        consts.gateFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.gateIdentifier+consts.gateCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "gate");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -398,18 +355,21 @@ public class MenuController extends Main {
         if(consts.freightGateCurrentCapacity < consts.freightGateMaxCapacity && !hasParked) {
             if(!consts.freightGateFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.freightGateAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.freightGateMaxTime >= landingTime) {
+                    if(consts.freightGateMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.freightGateCurrentCapacity++;
                         freightGate.setText("Freight Gate: " + consts.freightGateCurrentCapacity + " / " + consts.freightGateMaxCapacity);
-                        consts.freightGateFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.freightGateIdentifier+consts.freightGateCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "freightGate");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -417,18 +377,21 @@ public class MenuController extends Main {
         if(consts.zoneACurrentCapacity < consts.zoneAMaxCapacity && !hasParked) {
             if(!consts.zoneAFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.zoneAAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.zoneAMaxTime >= landingTime) {
+                    if(consts.zoneAMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.zoneACurrentCapacity++;
                         zoneA.setText("Zone A: " + consts.zoneACurrentCapacity + " / " + consts.zoneAMaxCapacity);
-                        consts.zoneAFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.zoneAIdentifier+consts.zoneACurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "zoneA");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -436,18 +399,21 @@ public class MenuController extends Main {
         if(consts.zoneBCurrentCapacity < consts.zoneBMaxCapacity && !hasParked) {
             if(!consts.zoneBFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.zoneBAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.zoneBMaxTime >= landingTime) {
+                    if(consts.zoneBMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.zoneBCurrentCapacity++;
                         zoneB.setText("Zone B: " + consts.zoneBCurrentCapacity + " / " + consts.zoneBMaxCapacity);
-                        consts.zoneBFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.zoneBIdentifier+consts.zoneBCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "zoneB");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -455,18 +421,21 @@ public class MenuController extends Main {
         if(consts.zoneCCurrentCapacity < consts.zoneCMaxCapacity && !hasParked) {
             if(!consts.zoneCFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.zoneCAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.zoneCMaxTime >= landingTime) {
+                    if(consts.zoneCMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.zoneCCurrentCapacity++;
                         zoneC.setText("Zone C: " + consts.zoneCCurrentCapacity + " / " + consts.zoneCMaxCapacity);
-                        consts.zoneCFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.zoneCIdentifier+consts.zoneCCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "zoneC");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -474,18 +443,21 @@ public class MenuController extends Main {
         if(consts.generalCurrentCapacity < consts.generalMaxCapacity && !hasParked) {
             if(!consts.generalFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.generalAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.generalMaxTime >= landingTime) {
+                    if(consts.generalMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.generalCurrentCapacity++;
                         general.setText("General Parking Space: " + consts.generalCurrentCapacity + " / " + consts.generalMaxCapacity);
-                        consts.generalFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.generalIdentifier+consts.generalCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "general");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -493,18 +465,21 @@ public class MenuController extends Main {
         if(consts.longTermCurrentCapacity < consts.longTermMaxCapacity && !hasParked) {
             if(!consts.longTermFlightType[Integer.parseInt(flightType)-1].equals("-")) {
                 if(!consts.longTermAirplaneType[Integer.parseInt(planeType)-1].equals("-")) {
-                    if(consts.longTermMaxTime >= landingTime) {
+                    if(consts.longTermMaxTime >= landingTime + Integer.parseInt(newFlight.get(10))) {
                         //finally empty appropriate spot
                         hasParked = true;
                         consts.longTermCurrentCapacity++;
                         longTerm.setText("Long Term: " + consts.longTermCurrentCapacity + " / " + consts.longTermMaxCapacity);
-                        consts.longTermFlights.put(flight_id, this.seconds+landingTime);
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.longTermIdentifier+consts.longTermCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Parked");
+                        newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds+landingTime));
+                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        //we set the gate which is parked
+                        newFlight.set(9, "longTerm");
+                        //we set the time that it begins to land
+                        newFlight.set(11, Integer.toString(this.seconds));
                     }
                 }
             }
@@ -522,18 +497,21 @@ public class MenuController extends Main {
             if (consts.gateCurrentCapacity < consts.gateMaxCapacity && !hasParked) {
                 if (!consts.gateFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.gateAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.gateMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.gateMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.gateCurrentCapacity++;
                             gate.setText("Gate: " + consts.gateCurrentCapacity + " / " + consts.gateMaxCapacity);
-                            consts.gateFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.gateIdentifier + consts.gateCurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "gate");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
@@ -541,18 +519,21 @@ public class MenuController extends Main {
             if (consts.freightGateCurrentCapacity < consts.freightGateMaxCapacity && !hasParked) {
                 if (!consts.freightGateFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.freightGateAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.freightGateMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.freightGateMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.freightGateCurrentCapacity++;
                             freightGate.setText("Gate: " + consts.freightGateCurrentCapacity + " / " + consts.freightGateMaxCapacity);
-                            consts.freightGateFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.freightGateIdentifier + consts.freightGateCurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "freightGate");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
@@ -560,37 +541,45 @@ public class MenuController extends Main {
             if (consts.zoneACurrentCapacity < consts.zoneAMaxCapacity && !hasParked) {
                 if (!consts.zoneAFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.zoneAAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.zoneAMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.zoneAMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.zoneACurrentCapacity++;
                             zoneA.setText("Gate: " + consts.zoneACurrentCapacity + " / " + consts.zoneAMaxCapacity);
-                            consts.zoneAFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.zoneAIdentifier + consts.zoneACurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "zoneA");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
             }
+
+
             if (consts.zoneBCurrentCapacity < consts.zoneBMaxCapacity && !hasParked) {
                 if (!consts.zoneBFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.zoneBAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.zoneBMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.zoneBMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.zoneBCurrentCapacity++;
                             zoneB.setText("Gate: " + consts.zoneBCurrentCapacity + " / " + consts.zoneBMaxCapacity);
-                            consts.zoneBFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.zoneBIdentifier + consts.zoneBCurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "zoneB");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
@@ -598,18 +587,21 @@ public class MenuController extends Main {
             if (consts.zoneCCurrentCapacity < consts.zoneCMaxCapacity && !hasParked) {
                 if (!consts.zoneCFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.zoneCAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.zoneCMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.zoneCMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.zoneCCurrentCapacity++;
                             zoneC.setText("Gate: " + consts.zoneCCurrentCapacity + " / " + consts.zoneCMaxCapacity);
-                            consts.zoneCFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.zoneCIdentifier + consts.zoneCCurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "zoneC");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
@@ -617,18 +609,21 @@ public class MenuController extends Main {
             if (consts.generalCurrentCapacity < consts.generalMaxCapacity && !hasParked) {
                 if (!consts.generalFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.generalAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.generalMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.generalMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.generalCurrentCapacity++;
                             general.setText("Gate: " + consts.generalCurrentCapacity + " / " + consts.generalMaxCapacity);
-                            consts.generalFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.generalIdentifier + consts.generalCurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "general");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
@@ -636,18 +631,21 @@ public class MenuController extends Main {
             if (consts.longTermCurrentCapacity < consts.longTermMaxCapacity && !hasParked) {
                 if (!consts.longTermFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.longTermAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
-                        if (consts.longTermMaxTime >= Integer.parseInt(flight.get(8))) {
+                        if (consts.longTermMaxTime >= Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))) {
                             //finally empty appropriate spot
                             hasParked = true;
                             consts.longTermCurrentCapacity++;
                             longTerm.setText("Gate: " + consts.longTermCurrentCapacity + " / " + consts.longTermMaxCapacity);
-                            consts.longTermFlights.put(flight.get(0), this.seconds + Integer.parseInt(flight.get(8)));
                             //this is the parking spot e.g. G1 and we change the default value
                             flight.set(4, consts.longTermIdentifier + consts.longTermCurrentCapacity);
                             //we set the state of the flight and we change the default value
-                            flight.set(5, "Parked");
+                            flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8))));
+                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            //we set the gate which is parked
+                            flight.set(9, "longTerm");
+                            //we set the time that it begins to land
+                            flight.set(11, Integer.toString(this.seconds));
                         }
                     }
                 }
@@ -656,65 +654,69 @@ public class MenuController extends Main {
         }
     }
 
+    public void checkForStateChanges() {
+        for (List<String> flight : ledger.flightLedger) {
+            if(flight.get(5).equals("Landing") && this.seconds == (Integer.parseInt(flight.get(11)) + Integer.parseInt(flight.get(10)))) {
+                //we set the state of the flight to parked
+                flight.set(5, "Parked");
+                announcements.setText("Flight with id: " + flight.get(0) +" has parked safely.");
+            }
+        }
+    }
+
     public void buttonShowGates() {
         //we are going to traverse each gates hashmap in order to create strings of flight ids and departure times
-        String flightIds = "";
-        String departures = "";
-        for (Map.Entry<String, Integer> entry : consts.gateFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
+        String gateFlightIds = "";
+        String gateDepartures = "";
+        String freightGateFlightIds = "";
+        String freightGateDepartures = "";
+        String zoneAFlightIds = "";
+        String zoneADepartures = "";
+        String zoneBFlightIds = "";
+        String zoneBDepartures = "";
+        String zoneCFlightIds = "";
+        String zoneCDepartures = "";
+        String generalFlightIds = "";
+        String generalDepartures = "";
+        String longTermFlightIds = "";
+        String longTermDepartures = "";
+        for (List<String> flight : ledger.flightLedger) {
+            if(flight.get(9).equals("gate")){
+                gateFlightIds += flight.get(0) + ",";
+                gateDepartures += flight.get(6) + ",";
+            }
+            if(flight.get(9).equals("freightGate")){
+                freightGateFlightIds += flight.get(0) + ",";
+                freightGateDepartures += flight.get(6) + ",";
+            }
+            if(flight.get(9).equals("zoneA")){
+                zoneAFlightIds += flight.get(0) + ",";
+                zoneADepartures += flight.get(6) + ",";
+            }
+            if(flight.get(9).equals("zoneB")){
+                zoneBFlightIds += flight.get(0) + ",";
+                zoneBDepartures += flight.get(6) + ",";
+            }
+            if(flight.get(9).equals("zoneC")){
+                zoneCFlightIds += flight.get(0) + ",";
+                zoneCDepartures += flight.get(6) + ",";
+            }
+            if(flight.get(9).equals("general")){
+                generalFlightIds += flight.get(0) + ",";
+                generalDepartures += flight.get(6) + ",";
+            }
+            if(flight.get(9).equals("longTerm")){
+                longTermFlightIds += flight.get(0) + ",";
+                longTermDepartures += flight.get(6) + ",";
+            }
         }
-        String gate[] = {"gate" ,consts.gateIdentifier, consts.gateCurrentCapacity + "/" + consts.gateMaxCapacity, flightIds, departures};
-
-        flightIds = "";
-        departures = "";
-        for (Map.Entry<String, Integer> entry : consts.freightGateFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
-        }
-        String freightGate[] = {"Freight Gate" ,consts.freightGateIdentifier, consts.freightGateCurrentCapacity + "/" + consts.freightGateMaxCapacity, flightIds, departures};
-
-        flightIds = "";
-        departures = "";
-        for (Map.Entry<String, Integer> entry : consts.zoneAFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
-        }
-        String zoneA[] = {"Zone A" ,consts.zoneAIdentifier, consts.zoneACurrentCapacity + "/" + consts.zoneAMaxCapacity, flightIds, departures};
-
-        flightIds = "";
-        departures = "";
-        for (Map.Entry<String, Integer> entry : consts.zoneBFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
-        }
-        String zoneB[] = {"Zone B" ,consts.zoneBIdentifier, consts.zoneBCurrentCapacity + "/" + consts.zoneBMaxCapacity, flightIds, departures};
-
-        flightIds = "";
-        departures = "";
-        for (Map.Entry<String, Integer> entry : consts.zoneCFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
-        }
-        String zoneC[] = {"Zone C" ,consts.zoneCIdentifier, consts.zoneCCurrentCapacity + "/" + consts.zoneCMaxCapacity, flightIds, departures};
-
-        flightIds = "";
-        departures = "";
-        for (Map.Entry<String, Integer> entry : consts.generalFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
-        }
-        String general[] = {"General Parking Space" ,consts.generalIdentifier, consts.generalCurrentCapacity + "/" + consts.generalMaxCapacity, flightIds, departures};
-
-        flightIds = "";
-        departures = "";
-        for (Map.Entry<String, Integer> entry : consts.longTermFlights.entrySet()) {
-            flightIds += entry.getKey() + ",";
-            departures += entry.getValue().toString() + ",";
-        }
-        String longTerm[] = {"Long Term" ,consts.longTermIdentifier, consts.longTermCurrentCapacity + "/" + consts.longTermMaxCapacity, flightIds, departures};
-
-
+        String gate[] = {"gate" ,consts.gateIdentifier, consts.gateCurrentCapacity + "/" + consts.gateMaxCapacity, gateFlightIds, gateDepartures};
+        String freightGate[] = {"Freight Gate" ,consts.freightGateIdentifier, consts.freightGateCurrentCapacity + "/" + consts.freightGateMaxCapacity, freightGateFlightIds, freightGateDepartures};
+        String zoneA[] = {"Zone A" ,consts.zoneAIdentifier, consts.zoneACurrentCapacity + "/" + consts.zoneAMaxCapacity, zoneAFlightIds, zoneADepartures};
+        String zoneB[] = {"Zone B" ,consts.zoneBIdentifier, consts.zoneBCurrentCapacity + "/" + consts.zoneBMaxCapacity, zoneBFlightIds, zoneBDepartures};
+        String zoneC[] = {"Zone C" ,consts.zoneCIdentifier, consts.zoneCCurrentCapacity + "/" + consts.zoneCMaxCapacity, zoneCFlightIds, zoneCDepartures};
+        String general[] = {"General Parking Space" ,consts.generalIdentifier, consts.generalCurrentCapacity + "/" + consts.generalMaxCapacity, generalFlightIds, generalDepartures};
+        String longTerm[] = {"Long Term" ,consts.longTermIdentifier, consts.longTermCurrentCapacity + "/" + consts.longTermMaxCapacity, longTermFlightIds, longTermDepartures};
 
         TableView<PopUpGates> table = PopUpGates.setGatesForPopUp(gate, freightGate, zoneA, zoneB, zoneC, general, longTerm);
         JFXDialog dialog = new JFXDialog(stackPane, table, JFXDialog.DialogTransition.TOP);
@@ -735,7 +737,7 @@ public class MenuController extends Main {
         for (List<String> list : ledger.flightLedger) {
             if(list.get(5).equals("Holding")) nextDepartureFlights.add(list);
         }
-        TableView<PopUpNextDepartures> table = PopUpNextDepartures.setNextDeparturesForPopUp(nextDepartureFlights);
+        TableView<PopUpHoldingFlights> table = PopUpHoldingFlights.setHoldingFlightsForPopUp(nextDepartureFlights);
         JFXDialog dialog = new JFXDialog(stackPane, table, JFXDialog.DialogTransition.TOP);
         dialog.show();
     }
