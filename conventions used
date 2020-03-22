@@ -5,5 +5,13 @@ and the departure of a flight is 80 that means that in the 180th second we have 
 This conditions will be checked every second.
 3. In every gate there is a hast tables that maps a flight id with it's estimated departure time ( HashTable < flight_id, departure_time > )
 4. To popup window will be implemented with TableView. In order to minimize the popup you have to click to the slightly gray area.
+5. Every flight has a certain state (Landing, Holding, Departed, Parked) which is renewed as soon a change happens
+6. Two flights cannot have the same flight id!
+
 
 ToDO -> Make Details Menu Buttons
+prepei na tsekarw an xreiazomai to hashtable giati exw race condition sto check departures kai sto checkforPending flights
+    -> mia lush fainetai na einai na xrhshmopoihsw to ledger. To mono thema pou uparxei einai sto show gates. Isws na emfanizw pali apo to ledger kai na
+    tsekarw an exei to anagnwristiko ths pulhs sto prwto gramma tou whereParcked sto ledger.
+
+    an den prolabainw fainetai na mhn uparxei thema.

@@ -11,7 +11,6 @@ public class Constants {
      public int gateMaxTime = 45;
      public int gateMaxCapacity;
      public int gateCurrentCapacity;
-     public static ArrayList<Integer> gateDockTimes = new ArrayList<>();
      public String gateIdentifier;
      public int gateCost;
      public Hashtable<String, Integer> gateFlights = new Hashtable<String, Integer>();
@@ -22,7 +21,6 @@ public class Constants {
      public int freightGateMaxTime = 90;
      public int freightGateMaxCapacity;
      public int freightGateCurrentCapacity;
-     public static ArrayList<Integer> freightGateDockTimes = new ArrayList<>();
      public String freightGateIdentifier;
      public int freightGateCost;
      public Hashtable<String, Integer> freightGateFlights = new Hashtable<String, Integer>();
@@ -33,7 +31,6 @@ public class Constants {
      public int zoneAMaxTime = 90;
      public int zoneAMaxCapacity;
      public int zoneACurrentCapacity;
-     public static ArrayList<Integer> zoneADockTimes = new ArrayList<>();
      public String zoneAIdentifier;
      public int zoneACost;
      public Hashtable<String, Integer> zoneAFlights = new Hashtable<String, Integer>();
@@ -44,7 +41,6 @@ public class Constants {
      public int zoneBMaxTime = 120;
      public int zoneBMaxCapacity;
      public int zoneBCurrentCapacity;
-     public static ArrayList<Integer> zoneBDockTimes = new ArrayList<>();
      public String zoneBIdentifier;
      public int zoneBCost;
      public Hashtable<String, Integer> zoneBFlights = new Hashtable<String, Integer>();
@@ -55,7 +51,6 @@ public class Constants {
      public int zoneCMaxTime = 180;
      public int zoneCMaxCapacity;
      public int zoneCCurrentCapacity;
-     public static ArrayList<Integer> zoneCDockTimes = new ArrayList<>();
      public String zoneCIdentifier;
      public int zoneCCost;
      public Hashtable<String, Integer> zoneCFlights = new Hashtable<String, Integer>();
@@ -66,7 +61,6 @@ public class Constants {
      public int generalMaxTime = 240;
      public int generalMaxCapacity;
      public int generalCurrentCapacity;
-     public static ArrayList<Integer> generalDockTimes = new ArrayList<>();
      public String generalIdentifier;
      public int generalCost;
      public Hashtable<String, Integer> generalFlights = new Hashtable<String, Integer>();
@@ -77,7 +71,6 @@ public class Constants {
      public int longTermMaxTime = 600;
      public int longTermMaxCapacity;
      public int longTermCurrentCapacity;
-     public static ArrayList<Integer> longTermDockTimes = new ArrayList<>();
      public String longTermIdentifier;
      public int longTermCost;
      public Hashtable<String, Integer> longTermFlights = new Hashtable<String, Integer>();
