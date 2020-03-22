@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
@@ -20,13 +21,22 @@ import javafx.util.Duration;
 import sample.Main;
 import sample.helper.*;
 
-public class MenuController extends Main {
-
-    @FXML
-    private Label announcements;
+public class MainController extends Main {
 
     @FXML
     private Label medialabLabel;
+
+    @FXML
+    private Label arrivedFlightsLabel;
+
+    @FXML
+    private Label totalParkingSpaceLabel;
+
+    @FXML
+    private Label departingIn10MinutesLabel;
+
+    @FXML
+    private Label revenueLabel;
 
     @FXML
     private Label timerLabel;
@@ -51,6 +61,9 @@ public class MenuController extends Main {
 
     @FXML
     private Label zoneB;
+
+    @FXML
+    private Label announcements;
 
     @FXML
     private StackPane stackPane;
@@ -94,21 +107,46 @@ public class MenuController extends Main {
     @FXML
     private MenuItem nextDepartures;
 
+
     private List<List<String>> startupAirportGates = new ArrayList<>();
     private List<List<String>> startupAirportFlights = new ArrayList<>();
     private Flights ledger = new Flights();
 
 
-    private int seconds = 0;
+    private int minutes = 0;
     private int hours;
-    private Constants consts;
+    private Gates consts = new Gates();
+    private Random random = new Random();
+    private int revenue = 0;
 
     @FXML
     void initialize() {
         //start menu item which reads a txt file for the airports' gates and flights.
         startMenuItem.setOnAction(actionEvent -> {
-            //initialize consts
-             consts = new Constants();
+                    //read the files///////////////////////////////////////////////
+                    try (BufferedReader br = new BufferedReader(new FileReader("airport_default.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            String[] values = line.split(",");
+                            startupAirportGates.add(Arrays.asList(values));
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try (BufferedReader br = new BufferedReader(new FileReader("setup_default.txt"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            String[] values = line.split(",");
+                            startupAirportFlights.add(Arrays.asList(values));
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
             //initialize timer/////////////////////////////////////////////
             Timeline timeline = new Timeline(new KeyFrame(
                     Duration.millis(1000),
@@ -116,95 +154,59 @@ public class MenuController extends Main {
             timeline.setCycleCount(Animation.INDEFINITE);
             timeline.play();
 
-            //read the files///////////////////////////////////////////////
-            try (BufferedReader br = new BufferedReader(new FileReader("airport_default.csv"))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] values = line.split(",");
-                    startupAirportGates.add(Arrays.asList(values));
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try (BufferedReader br = new BufferedReader(new FileReader("setup_default.csv"))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    String[] values = line.split(",");
-                    startupAirportFlights.add(Arrays.asList(values));
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-
-
-            ////////////////////////////////////////////////////////////
-
-
-            //time to initialize our parking spots
-            for (List<String> strings : startupAirportGates) {
-                if (strings.get(0).equals("1")) {
-                    gate.setText("Gate:" + "- / " + strings.get(1));
-                    consts.gateMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.gateCurrentCapacity = 0;
-                    consts.gateCost = Integer.parseInt(strings.get(2));
-                    consts.gateIdentifier = strings.get(3);
-                } else if (strings.get(0).equals("2")) {
-                    freightGate.setText("Freight Gate:" + "- / " + strings.get(1));
-                    consts.freightGateMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.freightGateCurrentCapacity = 0;
-                    consts.freightGateCost = Integer.parseInt(strings.get(2));
-                    consts.freightGateIdentifier = strings.get(3);
-                } else if (strings.get(0).equals("3")) {
-                    zoneA.setText("Zone A:" + "- / " + strings.get(1));
-                    consts.zoneAMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.zoneACurrentCapacity = 0;
-                    consts.zoneACost = Integer.parseInt(strings.get(2));
-                    consts.zoneAIdentifier = strings.get(3);
-                } else if (strings.get(0).equals("4")) {
-                    zoneB.setText("Zone B:" + "- / " + strings.get(1));
-                    consts.zoneBMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.zoneBCurrentCapacity = 0;
-                    consts.zoneBCost = Integer.parseInt(strings.get(2));
-                    consts.zoneBIdentifier = strings.get(3);
-                } else if (strings.get(0).equals("5")) {
-                    zoneC.setText("Zone C:" + "- / " + strings.get(1));
-                    consts.zoneCMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.zoneCCurrentCapacity = 0;
-                    consts.zoneCCost = Integer.parseInt(strings.get(2));
-                    consts.zoneCIdentifier = strings.get(3);
-                } else if (strings.get(0).equals("6")) {
-                    general.setText("General Parking Space:" + "- / " + strings.get(1));
-                    consts.generalMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.generalCurrentCapacity = 0;
-                    consts.generalCost = Integer.parseInt(strings.get(2));
-                    consts.generalIdentifier = strings.get(3);
-                } else if (strings.get(0).equals("7")) {
-                    longTerm.setText("Long Term:" + "- / " + strings.get(1));
-                    consts.longTermMaxCapacity = Integer.parseInt(strings.get(1));
-                    consts.longTermCurrentCapacity = 0;
-                    consts.longTermCost = Integer.parseInt(strings.get(2));
-                    consts.longTermIdentifier = strings.get(3);
-                }
-            }
-
-            //lets initialize our parking spots with flights already on the ground
-            for (List<String> strings : startupAirportFlights) {
-                insertFlight(strings);
-            }
-
+            startTheApp();
         });
 
         loadMenuItem.setOnAction(actionEvent -> {
-            System.out.println("Hello load");
-            buttonShowGates();
+            AtomicBoolean error = new AtomicBoolean(false);
+            TextField text = new TextField("Insert id and press enter");
+            JFXDialog dialog = new JFXDialog(stackPane, text, JFXDialog.DialogTransition.TOP);
+            dialog.show();
+            text.setOnAction(actionEvent1 -> {
+                System.out.println(text.getText());
+                dialog.close();
+                //read the files///////////////////////////////////////////////
+                try (BufferedReader br = new BufferedReader(new FileReader("airport_"+ text.getText() +".txt"))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        String[] values = line.split(",");
+                        startupAirportGates.add(Arrays.asList(values));
+                    }
+                } catch (FileNotFoundException e) {
+                    error.set(true);
+                    JFXDialog errorDialog = new JFXDialog(stackPane, new Label("No such file"), JFXDialog.DialogTransition.TOP);
+                    errorDialog.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try (BufferedReader br = new BufferedReader(new FileReader("setup_"+ text.getText()+".txt"))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        String[] values = line.split(",");
+                        startupAirportFlights.add(Arrays.asList(values));
+                    }
+                } catch (FileNotFoundException e) {
+                    error.set(true);
+                    JFXDialog errorDialog = new JFXDialog(stackPane, new Label("No such file"), JFXDialog.DialogTransition.TOP);
+                    errorDialog.show();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                if(!error.get()) {
+                    //initialize timer/////////////////////////////////////////////
+                    Timeline timeline = new Timeline(new KeyFrame(
+                            Duration.millis(1000),
+                            ae -> increaseTimer()));
+                    timeline.setCycleCount(Animation.INDEFINITE);
+                    timeline.play();
+
+                    startTheApp();
+                }
+
+
+            });
         });
 
         exitMenuItem.setOnAction(actionEvent -> {
@@ -220,6 +222,8 @@ public class MenuController extends Main {
 
         holding.setOnAction(actionEvent -> buttonShowHoldingFlights());
 
+        delayed.setOnAction(actionEvent -> buttonShowDelayedFlights());
+
 
         //Add a new flight
         addFlight.setOnAction(actionEvent -> {
@@ -228,19 +232,75 @@ public class MenuController extends Main {
             List<String> fixedLengthList = Arrays.asList(text);
             // step three : copy fixed list to an ArrayList
             ArrayList<String> flight = new ArrayList<String>(fixedLengthList);
-            insertFlight(flight);
+            insertFlight(flight, false);
         });
     }
 
+    public void startTheApp() {
+        //time to initialize our parking spots
+        for (List<String> strings : startupAirportGates) {
+            if (strings.get(0).equals("1")) {
+                gate.setText("Gate:" + "- / " + strings.get(1));
+                consts.gateMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.gateCurrentCapacity = 0;
+                consts.gateCost = Integer.parseInt(strings.get(2));
+                consts.gateIdentifier = strings.get(3);
+            } else if (strings.get(0).equals("2")) {
+                freightGate.setText("Freight Gate:" + "- / " + strings.get(1));
+                consts.freightGateMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.freightGateCurrentCapacity = 0;
+                consts.freightGateCost = Integer.parseInt(strings.get(2));
+                consts.freightGateIdentifier = strings.get(3);
+            } else if (strings.get(0).equals("3")) {
+                zoneA.setText("Zone A:" + "- / " + strings.get(1));
+                consts.zoneAMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.zoneACurrentCapacity = 0;
+                consts.zoneACost = Integer.parseInt(strings.get(2));
+                consts.zoneAIdentifier = strings.get(3);
+            } else if (strings.get(0).equals("4")) {
+                zoneB.setText("Zone B:" + "- / " + strings.get(1));
+                consts.zoneBMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.zoneBCurrentCapacity = 0;
+                consts.zoneBCost = Integer.parseInt(strings.get(2));
+                consts.zoneBIdentifier = strings.get(3);
+            } else if (strings.get(0).equals("5")) {
+                zoneC.setText("Zone C:" + "- / " + strings.get(1));
+                consts.zoneCMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.zoneCCurrentCapacity = 0;
+                consts.zoneCCost = Integer.parseInt(strings.get(2));
+                consts.zoneCIdentifier = strings.get(3);
+            } else if (strings.get(0).equals("6")) {
+                general.setText("General Parking Space:" + "- / " + strings.get(1));
+                consts.generalMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.generalCurrentCapacity = 0;
+                consts.generalCost = Integer.parseInt(strings.get(2));
+                consts.generalIdentifier = strings.get(3);
+            } else if (strings.get(0).equals("7")) {
+                longTerm.setText("Long Term:" + "- / " + strings.get(1));
+                consts.longTermMaxCapacity = Integer.parseInt(strings.get(1));
+                consts.longTermCurrentCapacity = 0;
+                consts.longTermCost = Integer.parseInt(strings.get(2));
+                consts.longTermIdentifier = strings.get(3);
+            }
+        }
+
+        //lets initialize our parking spots with flights already on the ground
+        for (List<String> strings : startupAirportFlights) {
+            insertFlight(strings, true);
+        }
+    }
+
     public void increaseTimer() {
-        System.out.println(this.seconds);
-        this.seconds++;
-        this.hours = this.seconds/3600;
-        timerLabel.setText("Total Time Ellapsed  " + this.hours + " : " + (this.seconds-(3600*this.hours))/60);
-        checkForDepartures();
+        System.out.println(this.minutes);
+        this.minutes++;
+        this.hours = this.minutes /60;
+        timerLabel.setText("Total Time Elapsed  " + (this.hours%24) + " : " + (this.minutes %60));
         checkForPendingFlights();
         checkForStateChanges();
-
+        checkForDepartures();
+        totalParkingSpaceLabel.setText("Total Parking Space: " + ledger.flightLedger.size() + " / " + (consts.gateMaxCapacity+consts.freightGateMaxCapacity+consts.zoneAMaxCapacity+consts.zoneBMaxCapacity+consts.zoneCMaxCapacity+consts.generalMaxCapacity+consts.longTermMaxCapacity));
+        departingIn10MinutesLabel.setText("No. of Flights Departing in 10 next minutes: " + next10MinDepartures());
+        arrivedFlightsLabel.setText("Arrived Flights: " + ledger.flightLedger.size());
     }
 
     public void checkForDepartures() {
@@ -248,7 +308,27 @@ public class MenuController extends Main {
         Iterator<List<String>> itr = ledger.flightLedger.iterator();
         while (itr.hasNext()) {
             List<String> flight = itr.next();
-            if (flight.get(5).equals("Parked") && Integer.parseInt(flight.get(6)) == this.seconds) {
+            if (flight.get(5).equals("Parked") && Integer.parseInt(flight.get(12)) == this.minutes) {
+                if(this.minutes > Integer.parseInt(flight.get(6))){
+                    announcements.setText("Flight with id: " + flight.get(0) + " has just departed later than expected.");
+                    System.out.println("Delayed Flight");
+                }
+                else if(this.minutes < Integer.parseInt(flight.get(6))) {
+                    System.out.println("Departed earlier");
+                    if(Integer.parseInt(flight.get(8))-Integer.parseInt(flight.get(14))>= 25) {
+                        flight.set(13, Integer.toString((int) (Integer.parseInt(flight.get(13))*0.8)));
+                        System.out.println("Moneyyy = " +flight.get(13));
+                    }
+                    else if(Integer.parseInt(flight.get(8))-Integer.parseInt(flight.get(14))>= 10 && Integer.parseInt(flight.get(8))-Integer.parseInt(flight.get(14)) <=20) {
+                        flight.set(13, Integer.toString((int) (Integer.parseInt(flight.get(13))*0.9)));
+                        System.out.println("Moneyyy = " +flight.get(13));
+
+                    }
+                    announcements.setText("Flight with id: " + flight.get(0) + " has just departed earlier than expected.");
+                }
+                else announcements.setText("Flight with id: " + flight.get(0) +" has just departed.");
+                revenue += Integer.parseInt(flight.get(13));
+                revenueLabel.setText("Total Revenue : " + revenue);
                 itr.remove();
                 if(flight.get(9).equals("gate")) {
                     consts.gateCurrentCapacity--;
@@ -278,12 +358,11 @@ public class MenuController extends Main {
                     consts.longTermCurrentCapacity--;
                     longTerm.setText("Long Term: " + consts.longTermCurrentCapacity + " / " + consts.longTermMaxCapacity);
                 }
-                announcements.setText("Flight with id: " + flight.get(0) +" has just departed.");
             }
         }
     }
 
-    public void insertFlight(List<String> flight) {
+    public void insertFlight(List<String> flight, Boolean firstTime) {
         //we check for already registered flight
         for (List<String> list : ledger.flightLedger) {
             if (list.get(0).equals(flight.get(0))) {
@@ -310,8 +389,8 @@ public class MenuController extends Main {
         //departureTime
         newFlight.add("");
         //firstContact
-        newFlight.add(Integer.toString(this.seconds));
-        //timeParked
+        newFlight.add(Integer.toString(this.minutes));
+        //initialTimeSpendLanded
         newFlight.add(flight.get(4).trim());
         //gateParked
         newFlight.add("");
@@ -324,7 +403,15 @@ public class MenuController extends Main {
             newFlight.add("2");
         //timeItStartsLanding
         newFlight.add("");
+        //actualTimeSpendLanded can have random value
+        newFlight.add("");
+        //costOfParking
+        newFlight.add("");
+        //a field to keep the random time for pricing reason
+        newFlight.add("");
 
+
+        int randomNum = random.nextInt(Integer.parseInt(newFlight.get(8))*2);
         Boolean hasParked = false;
         String flightType = flight.get(2).trim();
         String planeType = flight.get(3).trim();
@@ -341,13 +428,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.gateIdentifier+consts.gateCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "gate");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.gateCost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -363,13 +460,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.freightGateIdentifier+consts.freightGateCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "freightGate");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.freightGateCost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -385,13 +492,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.zoneAIdentifier+consts.zoneACurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "zoneA");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.zoneACost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -407,13 +524,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.zoneBIdentifier+consts.zoneBCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "zoneB");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.zoneBCost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -429,13 +556,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.zoneCIdentifier+consts.zoneCCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "zoneC");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.zoneCCost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -451,13 +588,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.generalIdentifier+consts.generalCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "general");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.generalCost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -473,13 +620,23 @@ public class MenuController extends Main {
                         //this is the parking spot e.g. G1 and we change the default value
                         newFlight.set(4, consts.longTermIdentifier+consts.longTermCurrentCapacity);
                         //we set the state of the flight and we change the default value
-                        newFlight.set(5, "Landing");
+                        if(firstTime) newFlight.set(5, "Parked");
+                        else newFlight.set(5, "Landing");
                         //we set the departure time and we change the default value
-                        newFlight.set(6, Integer.toString(this.seconds + landingTime + Integer.parseInt(newFlight.get(10))));
+                        if(firstTime) newFlight.set(6, Integer.toString(this.minutes + landingTime));
+                        else newFlight.set(6, Integer.toString(this.minutes + landingTime + Integer.parseInt(newFlight.get(10))));
                         //we set the gate which is parked
                         newFlight.set(9, "longTerm");
                         //we set the time that it begins to land
-                        newFlight.set(11, Integer.toString(this.seconds));
+                        if(firstTime) newFlight.set(11, "");
+                        else newFlight.set(11, Integer.toString(this.minutes));
+                        //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                        if(firstTime) newFlight.set(12, Integer.toString(randomNum + this.minutes));
+                        else newFlight.set(12 ,Integer.toString(randomNum +Integer.parseInt(newFlight.get(10)) + this.minutes));
+                        //we add the cost of each gate
+                        newFlight.set(13, Integer.toString(consts.longTermCost));
+                        //a field to keep the random time for pricing reason
+                        newFlight.set(14, Integer.toString(randomNum));
                     }
                 }
             }
@@ -492,7 +649,7 @@ public class MenuController extends Main {
         for (List<String> flight : ledger.flightLedger) {
             if (!flight.get(5).equals("Holding")) continue;
 
-
+            int randomNum = random.nextInt(Integer.parseInt(flight.get(8))*2);
             Boolean hasParked = false;
             if (consts.gateCurrentCapacity < consts.gateMaxCapacity && !hasParked) {
                 if (!consts.gateFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
@@ -507,11 +664,17 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "gate");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.gateCost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
@@ -529,11 +692,17 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "freightGate");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.freightGateCost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
@@ -551,17 +720,21 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "zoneA");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.zoneACost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
             }
-
-
             if (consts.zoneBCurrentCapacity < consts.zoneBMaxCapacity && !hasParked) {
                 if (!consts.zoneBFlightType[Integer.parseInt(flight.get(2)) - 1].equals("-")) {
                     if (!consts.zoneBAirplaneType[Integer.parseInt(flight.get(3)) - 1].equals("-")) {
@@ -575,11 +748,17 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "zoneB");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.zoneBCost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
@@ -597,11 +776,17 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "zoneC");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.zoneCCost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
@@ -619,11 +804,18 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "general");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            System.out.println("id: " + flight.get(0) +" -> " + flight.get(12));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.generalCost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
@@ -641,11 +833,17 @@ public class MenuController extends Main {
                             //we set the state of the flight and we change the default value
                             flight.set(5, "Landing");
                             //we set the departure time and we change the default value
-                            flight.set(6, Integer.toString(this.seconds + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
+                            flight.set(6, Integer.toString(this.minutes + Integer.parseInt(flight.get(8)) + Integer.parseInt(flight.get(10))));
                             //we set the gate which is parked
                             flight.set(9, "longTerm");
                             //we set the time that it begins to land
-                            flight.set(11, Integer.toString(this.seconds));
+                            flight.set(11, Integer.toString(this.minutes));
+                            //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
+                            flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
+                            //we add the cost of each gate
+                            flight.set(13, Integer.toString(consts.longTermCost));
+                            //a field to keep the random time for pricing reason
+                            flight.set(14, Integer.toString(randomNum));
                         }
                     }
                 }
@@ -656,7 +854,7 @@ public class MenuController extends Main {
 
     public void checkForStateChanges() {
         for (List<String> flight : ledger.flightLedger) {
-            if(flight.get(5).equals("Landing") && this.seconds == (Integer.parseInt(flight.get(11)) + Integer.parseInt(flight.get(10)))) {
+            if(flight.get(5).equals("Landing") && this.minutes == (Integer.parseInt(flight.get(11)) + Integer.parseInt(flight.get(10)))) {
                 //we set the state of the flight to parked
                 flight.set(5, "Parked");
                 announcements.setText("Flight with id: " + flight.get(0) +" has parked safely.");
@@ -730,12 +928,26 @@ public class MenuController extends Main {
         dialog.show();
     }
 
+    private void buttonShowDelayedFlights() {
+        //we make a new list with only flights that have been delayed
+        List<List<String>> delayedFlights = new ArrayList<>();
+
+        for (List<String> flight : ledger.flightLedger) {
+            if (flight.get(5).equals("Parked")) {
+                if (this.minutes > Integer.parseInt(flight.get(6))) delayedFlights.add(flight);
+            }
+        }
+        TableView<PopUpHoldingFlights> table = PopUpHoldingFlights.setHoldingFlightsForPopUp(delayedFlights);
+        JFXDialog dialog = new JFXDialog(stackPane, table, JFXDialog.DialogTransition.TOP);
+        dialog.show();
+    }
+
     private void buttonShowHoldingFlights() {
         //we make a new list with only flights to be departed in the next 10 minutes
         List<List<String>> nextDepartureFlights = new ArrayList<>();
 
-        for (List<String> list : ledger.flightLedger) {
-            if(list.get(5).equals("Holding")) nextDepartureFlights.add(list);
+        for (List<String> flight : ledger.flightLedger) {
+            if(flight.get(5).equals("Holding")) nextDepartureFlights.add(flight);
         }
         TableView<PopUpHoldingFlights> table = PopUpHoldingFlights.setHoldingFlightsForPopUp(nextDepartureFlights);
         JFXDialog dialog = new JFXDialog(stackPane, table, JFXDialog.DialogTransition.TOP);
@@ -746,9 +958,9 @@ public class MenuController extends Main {
         //we make a new list with only flights to be departed in the next 10 minutes
         List<List<String>> nextDepartureFlights = new ArrayList<>();
 
-        for (List<String> list : ledger.flightLedger) {
-            if (list.get(6) != "") {
-                if (Integer.parseInt(list.get(6)) <= this.seconds + 600) nextDepartureFlights.add(list);
+        for (List<String> flight : ledger.flightLedger) {
+            if (!flight.get(6).equals("")) {
+                if (Integer.parseInt(flight.get(6)) <= this.minutes + 10) nextDepartureFlights.add(flight);
             }
         }
         TableView<PopUpNextDepartures> table = PopUpNextDepartures.setNextDeparturesForPopUp(nextDepartureFlights);
@@ -756,5 +968,16 @@ public class MenuController extends Main {
         dialog.show();
     }
 
+    private int next10MinDepartures() {
+        //we make a new list with only flights to be departed in the next 10 minutes
+        List<List<String>> nextDepartureFlights = new ArrayList<>();
+
+        for (List<String> flight : ledger.flightLedger) {
+            if (!flight.get(6).equals("")) {
+                if (Integer.parseInt(flight.get(6)) <= this.minutes + 10) nextDepartureFlights.add(flight);
+            }
+        }
+        return nextDepartureFlights.size();
+    }
 
 }

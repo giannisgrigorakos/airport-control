@@ -1,9 +1,8 @@
 package sample.helper;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
 
-public class Constants {
+
+public class Gates {
     //convention that of the above have all the options. When we encounter with an "-" string the type in not supported
      public String gateFlightType[] = {"passengers", "-", "-"};
      public String gateAirplaneType[] = {"-", "turboprop", "jet"};
@@ -13,7 +12,6 @@ public class Constants {
      public int gateCurrentCapacity;
      public String gateIdentifier;
      public int gateCost;
-     public Hashtable<String, Integer> gateFlights = new Hashtable<String, Integer>();
 
      public String freightGateFlightType[] = {"-", "cargo", "-"};
      public String freightGateAirplaneType[] = {"-", "turboprop", "jet"};
@@ -23,7 +21,6 @@ public class Constants {
      public int freightGateCurrentCapacity;
      public String freightGateIdentifier;
      public int freightGateCost;
-     public Hashtable<String, Integer> freightGateFlights = new Hashtable<String, Integer>();
 
      public String zoneAFlightType[] = {"passengers", "-", "-"};
      public String zoneAAirplaneType[] = {"-", "turboprop", "jet"};
@@ -33,7 +30,6 @@ public class Constants {
      public int zoneACurrentCapacity;
      public String zoneAIdentifier;
      public int zoneACost;
-     public Hashtable<String, Integer> zoneAFlights = new Hashtable<String, Integer>();
 
      public String zoneBFlightType[] = {"passengers", "cargo", "private"};
      public String zoneBAirplaneType[] = {"-", "turboprop", "jet"};
@@ -43,7 +39,6 @@ public class Constants {
      public int zoneBCurrentCapacity;
      public String zoneBIdentifier;
      public int zoneBCost;
-     public Hashtable<String, Integer> zoneBFlights = new Hashtable<String, Integer>();
 
      public String zoneCFlightType[] = {"passengers", "cargo", "private"};
      public String zoneCAirplaneType[] = {"monoplane", "-", "-"};
@@ -53,7 +48,6 @@ public class Constants {
      public int zoneCCurrentCapacity;
      public String zoneCIdentifier;
      public int zoneCCost;
-     public Hashtable<String, Integer> zoneCFlights = new Hashtable<String, Integer>();
 
      public String generalFlightType[] = {"passengers", "cargo", "private"};
      public String generalAirplaneType[] = {"monoplane", "turboprop", "jet"};
@@ -63,7 +57,6 @@ public class Constants {
      public int generalCurrentCapacity;
      public String generalIdentifier;
      public int generalCost;
-     public Hashtable<String, Integer> generalFlights = new Hashtable<String, Integer>();
 
      public String longTermFlightType[] = {"-", "cargo", "-"};
      public String longTermAirplaneType[] = {"monoplane", "turboprop", "jet"};
@@ -73,5 +66,4 @@ public class Constants {
      public int longTermCurrentCapacity;
      public String longTermIdentifier;
      public int longTermCost;
-     public Hashtable<String, Integer> longTermFlights = new Hashtable<String, Integer>();
 }

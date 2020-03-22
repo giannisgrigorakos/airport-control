@@ -3,7 +3,7 @@ package sample.helper;
 import java.util.*;
 
 public class Flights {
-    //here we store all our flights. The convention is [flightId, cityOfDeparture, flightType, planeType, whereParked, currentState, departureTime, firstContact, timeParked, gateParked, timeToLand, timeItStartsLanding]
+    //here we store all our flights. The convention is [flightId, cityOfDeparture, flightType, planeType, whereParked, currentState, departureTime, firstContact, initialTimeLanded, gateParked, timeToLand, timeItStartsLanding, realTimeLanded]
     public List<List<String>> flightLedger = new ArrayList<>();
 
 

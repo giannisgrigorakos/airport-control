@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="860.0" style="-fx-background-color: #0d47a1#0d47a1;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.MenuController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="860.0" style="-fx-background-color: #0d47a1#0d47a1;" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.controller.MainController">
    <children>
       <Label fx:id="medialabLabel" layoutX="358.0" layoutY="6.0" prefHeight="50.0" prefWidth="147.0" text="MediaLab Airport" textFill="WHITE">
          <font>
@@ -19,10 +19,10 @@
       </Label>
       <AnchorPane layoutX="27.0" layoutY="56.0" prefHeight="160.0" prefWidth="808.0" style="-fx-background-color: #ffffff;">
          <children>
-            <Label alignment="CENTER" layoutX="71.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Arrived Flights:" textFill="WHITE" />
-            <Label alignment="CENTER" layoutX="334.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Parking Space:" textFill="WHITE" />
-            <Label alignment="CENTER" layoutX="123.0" layoutY="97.0" prefHeight="33.0" prefWidth="263.0" style="-fx-background-color: #0d47a1#0d47a1;" text="No. of Flights Departing in 10 next minutes: " textFill="WHITE" />
-            <Label alignment="CENTER" layoutX="587.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Revenue: " textFill="WHITE" />
+            <Label fx:id="arrivedFlightsLabel" alignment="CENTER" layoutX="71.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Arrived Flights:" textFill="WHITE" />
+            <Label fx:id="totalParkingSpaceLabel" alignment="CENTER" layoutX="284.0" layoutY="32.0" prefHeight="33.0" prefWidth="230.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Parking Space:" textFill="WHITE" />
+            <Label fx:id="departingIn10MinutesLabel" alignment="CENTER" layoutX="123.0" layoutY="97.0" prefHeight="33.0" prefWidth="263.0" style="-fx-background-color: #0d47a1#0d47a1;" text="No. of Flights Departing in 10 next minutes: " textFill="WHITE" />
+            <Label fx:id="revenueLabel" alignment="CENTER" layoutX="587.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Revenue: " textFill="WHITE" />
             <Label fx:id="timerLabel" alignment="CENTER" layoutX="418.0" layoutY="97.0" prefHeight="33.0" prefWidth="245.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total TIme Ellapsed:" textFill="WHITE" />
          </children>
       </AnchorPane>
