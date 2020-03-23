@@ -66,6 +66,9 @@ public class MainController extends Main {
     private Label announcements;
 
     @FXML
+    private StackPane errorStackPane;
+
+    @FXML
     private StackPane stackPane;
 
     @FXML
@@ -111,6 +114,7 @@ public class MainController extends Main {
     private List<List<String>> startupAirportGates = new ArrayList<>();
     private List<List<String>> startupAirportFlights = new ArrayList<>();
     private Flights ledger = new Flights();
+    Timeline timeline = new Timeline();
 
 
     private int minutes = 0;
@@ -123,47 +127,41 @@ public class MainController extends Main {
     void initialize() {
         //start menu item which reads a txt file for the airports' gates and flights.
         startMenuItem.setOnAction(actionEvent -> {
-                    //read the files///////////////////////////////////////////////
-                    try (BufferedReader br = new BufferedReader(new FileReader("airport_default.txt"))) {
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            String[] values = line.split(",");
-                            startupAirportGates.add(Arrays.asList(values));
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            //read the files///////////////////////////////////////////////
+            try (BufferedReader br = new BufferedReader(new FileReader("airport_1.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] values = line.split(",");
+                    startupAirportGates.add(Arrays.asList(values));
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-                    try (BufferedReader br = new BufferedReader(new FileReader("setup_default.txt"))) {
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            String[] values = line.split(",");
-                            startupAirportFlights.add(Arrays.asList(values));
-                        }
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            //initialize timer/////////////////////////////////////////////
-            Timeline timeline = new Timeline(new KeyFrame(
-                    Duration.millis(1000),
-                    ae -> increaseTimer()));
-            timeline.setCycleCount(Animation.INDEFINITE);
-            timeline.play();
-
+            try (BufferedReader br = new BufferedReader(new FileReader("setup_1.txt"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    String[] values = line.split(",");
+                    startupAirportFlights.add(Arrays.asList(values));
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            clearAllExistingData();
+            initializeTimer();
             startTheApp();
         });
 
         loadMenuItem.setOnAction(actionEvent -> {
             AtomicBoolean error = new AtomicBoolean(false);
-            TextField text = new TextField("Insert id and press enter");
-            JFXDialog dialog = new JFXDialog(stackPane, text, JFXDialog.DialogTransition.TOP);
+            TextField text = new TextField(" Insert id and press enter ");
+            JFXDialog dialog = new JFXDialog(errorStackPane, text, JFXDialog.DialogTransition.TOP);
             dialog.show();
             text.setOnAction(actionEvent1 -> {
-                System.out.println(text.getText());
                 dialog.close();
                 //read the files///////////////////////////////////////////////
                 try (BufferedReader br = new BufferedReader(new FileReader("airport_"+ text.getText() +".txt"))) {
@@ -174,8 +172,6 @@ public class MainController extends Main {
                     }
                 } catch (FileNotFoundException e) {
                     error.set(true);
-                    JFXDialog errorDialog = new JFXDialog(stackPane, new Label("No such file"), JFXDialog.DialogTransition.TOP);
-                    errorDialog.show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -188,21 +184,18 @@ public class MainController extends Main {
                     }
                 } catch (FileNotFoundException e) {
                     error.set(true);
-                    JFXDialog errorDialog = new JFXDialog(stackPane, new Label("No such file"), JFXDialog.DialogTransition.TOP);
-                    errorDialog.show();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 if(!error.get()) {
-                    //initialize timer/////////////////////////////////////////////
-                    Timeline timeline = new Timeline(new KeyFrame(
-                            Duration.millis(1000),
-                            ae -> increaseTimer()));
-                    timeline.setCycleCount(Animation.INDEFINITE);
-                    timeline.play();
-
+                    clearAllExistingData();
+                    initializeTimer();
                     startTheApp();
+                }
+                else {
+                    JFXDialog errorDialog = new JFXDialog(errorStackPane, new Label(" No such file "), JFXDialog.DialogTransition.TOP);
+                    errorDialog.show();
                 }
 
 
@@ -227,15 +220,73 @@ public class MainController extends Main {
 
         //Add a new flight
         addFlight.setOnAction(actionEvent -> {
-            String[] text = newFlight.getText().split(",");
+            String[] text = newFlight.getText().replaceAll("\\s+", "").split(",");
             // step two : convert String array to list of String
             List<String> fixedLengthList = Arrays.asList(text);
             // step three : copy fixed list to an ArrayList
             ArrayList<String> flight = new ArrayList<String>(fixedLengthList);
-            insertFlight(flight, false);
+            if(flight.size() == 5) {
+                if(flight.get(2).matches("[0-9]*") && Integer.parseInt(flight.get(2)) >= 1 && Integer.parseInt(flight.get(2)) <= 3) {
+                    if(flight.get(3).matches("[0-9]*") && Integer.parseInt(flight.get(3)) >= 1 && Integer.parseInt(flight.get(3)) <= 3) {
+                        if(flight.get(4).matches("[0-9]*") && Integer.parseInt(flight.get(4)) >= 0) {
+
+                            insertFlight(flight, false);
+                        }
+                        else{
+                            JFXDialog dialog = new JFXDialog(errorStackPane, new Label("Time must be a positive number"), JFXDialog.DialogTransition.TOP);
+                            dialog.show();
+                        }
+                    }
+                    else{
+                        JFXDialog dialog = new JFXDialog(errorStackPane, new Label("Plane type must be 1,2 or 3"), JFXDialog.DialogTransition.TOP);
+                        dialog.show();
+                    }
+                }
+                else{
+                    JFXDialog dialog = new JFXDialog(errorStackPane, new Label("Flight type must be 1,2 or 3"), JFXDialog.DialogTransition.TOP);
+                    dialog.show();
+                }
+            }
+            else{
+                JFXDialog dialog = new JFXDialog(errorStackPane, new Label("Please provide a valid flight"), JFXDialog.DialogTransition.TOP);
+                dialog.show();
+            }
         });
     }
 
+    /** Clears all existing data for a fresh new start
+     *
+     */
+    private void clearAllExistingData() {
+        this.timeline.stop();
+        ledger.flightLedger.clear();
+        arrivedFlightsLabel.setText("Arrived Flights: ");
+        totalParkingSpaceLabel.setText("Total Parking Space: ");
+        revenueLabel.setText("Total Revenue: ");
+        departingIn10MinutesLabel.setText("No. of Flights Departing in 10 next minutes: ");
+        timerLabel.setText("Total TIme Elapsed: ");
+        this.minutes = 0;
+        this.hours = 0;
+        announcements.setText("");
+        this.consts.reset();
+
+    }
+
+    /** Initialize the timer
+     *
+     */
+    private void initializeTimer() {
+        this.timeline = new Timeline(new KeyFrame(
+                Duration.millis(5000),
+                ae -> increaseTimer()));
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+
+    }
+
+    /** Start the appllication
+     *
+     */
     public void startTheApp() {
         //time to initialize our parking spots
         for (List<String> strings : startupAirportGates) {
@@ -290,38 +341,38 @@ public class MainController extends Main {
         }
     }
 
+    /** In every time pulse increase the timer and do various computations
+     *
+     */
     public void increaseTimer() {
-        System.out.println(this.minutes);
         this.minutes++;
         this.hours = this.minutes /60;
         timerLabel.setText("Total Time Elapsed  " + (this.hours%24) + " : " + (this.minutes %60));
         checkForPendingFlights();
         checkForStateChanges();
         checkForDepartures();
-        totalParkingSpaceLabel.setText("Total Parking Space: " + ledger.flightLedger.size() + " / " + (consts.gateMaxCapacity+consts.freightGateMaxCapacity+consts.zoneAMaxCapacity+consts.zoneBMaxCapacity+consts.zoneCMaxCapacity+consts.generalMaxCapacity+consts.longTermMaxCapacity));
+        totalParkingSpaceLabel.setText("Total Parking Space: " + (consts.gateCurrentCapacity+consts.freightGateCurrentCapacity+consts.zoneACurrentCapacity+consts.zoneBCurrentCapacity+consts.zoneCCurrentCapacity+consts.generalCurrentCapacity+consts.longTermCurrentCapacity) + " / " + (consts.gateMaxCapacity+consts.freightGateMaxCapacity+consts.zoneAMaxCapacity+consts.zoneBMaxCapacity+consts.zoneCMaxCapacity+consts.generalMaxCapacity+consts.longTermMaxCapacity));
         departingIn10MinutesLabel.setText("No. of Flights Departing in 10 next minutes: " + next10MinDepartures());
         arrivedFlightsLabel.setText("Arrived Flights: " + ledger.flightLedger.size());
     }
 
+    /** Check for departures
+     *
+     */
     public void checkForDepartures() {
-
         Iterator<List<String>> itr = ledger.flightLedger.iterator();
         while (itr.hasNext()) {
             List<String> flight = itr.next();
             if (flight.get(5).equals("Parked") && Integer.parseInt(flight.get(12)) == this.minutes) {
                 if(this.minutes > Integer.parseInt(flight.get(6))){
                     announcements.setText("Flight with id: " + flight.get(0) + " has just departed later than expected.");
-                    System.out.println("Delayed Flight");
                 }
                 else if(this.minutes < Integer.parseInt(flight.get(6))) {
-                    System.out.println("Departed earlier");
                     if(Integer.parseInt(flight.get(8))-Integer.parseInt(flight.get(14))>= 25) {
                         flight.set(13, Integer.toString((int) (Integer.parseInt(flight.get(13))*0.8)));
-                        System.out.println("Moneyyy = " +flight.get(13));
                     }
                     else if(Integer.parseInt(flight.get(8))-Integer.parseInt(flight.get(14))>= 10 && Integer.parseInt(flight.get(8))-Integer.parseInt(flight.get(14)) <=20) {
                         flight.set(13, Integer.toString((int) (Integer.parseInt(flight.get(13))*0.9)));
-                        System.out.println("Moneyyy = " +flight.get(13));
 
                     }
                     announcements.setText("Flight with id: " + flight.get(0) + " has just departed earlier than expected.");
@@ -362,11 +413,18 @@ public class MainController extends Main {
         }
     }
 
+    /** Try to insert a flight
+     *
+     * @param flight A flight that is in the form of a list
+     * @param firstTime A variable that check if the insertion of a flight happens during a fresh start
+     *
+     */
     public void insertFlight(List<String> flight, Boolean firstTime) {
         //we check for already registered flight
         for (List<String> list : ledger.flightLedger) {
             if (list.get(0).equals(flight.get(0))) {
-                announcements.setText("Flight Id " + flight.get(0) + " already exists. You cant enter a flight with an existing flight id");
+                if(firstTime) announcements.setText("");
+                else announcements.setText("Flight with id: " + flight.get(0) + " already exists. You can't enter a flight with an existing flight id");
                 return;
             }
         }
@@ -642,9 +700,13 @@ public class MainController extends Main {
             }
         }
         if (!hasParked) announcements.setText("All parking spot have been filled! Please wait...");
+        else if(!firstTime) announcements.setText("Flight with id: " + newFlight.get(0) +" has just started landing.");
         ledger.flightLedger.add(newFlight);
     }
 
+    /** Check for flights that have a status of "Holding" and try to insert them to the airport
+     *
+     */
     public void checkForPendingFlights() {
         for (List<String> flight : ledger.flightLedger) {
             if (!flight.get(5).equals("Holding")) continue;
@@ -811,7 +873,6 @@ public class MainController extends Main {
                             flight.set(11, Integer.toString(this.minutes));
                             //actualTimeSpendLanded can have random valued in range 0-2*initialTimeSpendLanded + the seconds it does in order to park
                             flight.set(12 ,Integer.toString(randomNum + Integer.parseInt(flight.get(10)) + this.minutes));
-                            System.out.println("id: " + flight.get(0) +" -> " + flight.get(12));
                             //we add the cost of each gate
                             flight.set(13, Integer.toString(consts.generalCost));
                             //a field to keep the random time for pricing reason
@@ -849,9 +910,13 @@ public class MainController extends Main {
                 }
             }
             if (!hasParked) announcements.setText("All parking spot have been filled! Please wait...");
+            else announcements.setText("Flight with id: " + flight.get(0) +" has just started landing.");
         }
     }
 
+    /** Check for flight that have parked at the airport and change their status to parked
+     *
+     */
     public void checkForStateChanges() {
         for (List<String> flight : ledger.flightLedger) {
             if(flight.get(5).equals("Landing") && this.minutes == (Integer.parseInt(flight.get(11)) + Integer.parseInt(flight.get(10)))) {
@@ -862,6 +927,9 @@ public class MainController extends Main {
         }
     }
 
+    /** Show the airport's gates statuses when the Gates button is clicked
+     *
+     */
     public void buttonShowGates() {
         //we are going to traverse each gates hashmap in order to create strings of flight ids and departure times
         String gateFlightIds = "";
@@ -922,12 +990,18 @@ public class MainController extends Main {
     }
 
 
+    /** Show the flights statuses when the Flights button is clicked
+     *
+     */
     private void buttonShowFlights() {
         TableView<PopUpFlights> table = PopUpFlights.setFlightsForPopUp(ledger.flightLedger);
         JFXDialog dialog = new JFXDialog(stackPane, table, JFXDialog.DialogTransition.TOP);
         dialog.show();
     }
 
+    /** Show the delayed flights when the Flights button is clicked
+     *
+     */
     private void buttonShowDelayedFlights() {
         //we make a new list with only flights that have been delayed
         List<List<String>> delayedFlights = new ArrayList<>();
@@ -937,11 +1011,14 @@ public class MainController extends Main {
                 if (this.minutes > Integer.parseInt(flight.get(6))) delayedFlights.add(flight);
             }
         }
-        TableView<PopUpHoldingFlights> table = PopUpHoldingFlights.setHoldingFlightsForPopUp(delayedFlights);
+        TableView<PopUpDelayedFlights> table = PopUpDelayedFlights.setDelayedFlightsForPopUp(delayedFlights);
         JFXDialog dialog = new JFXDialog(stackPane, table, JFXDialog.DialogTransition.TOP);
         dialog.show();
     }
 
+    /** Show the flights that have a status of "Holding" when the Holding button is clicked
+     *
+     */
     private void buttonShowHoldingFlights() {
         //we make a new list with only flights to be departed in the next 10 minutes
         List<List<String>> nextDepartureFlights = new ArrayList<>();
@@ -954,6 +1031,9 @@ public class MainController extends Main {
         dialog.show();
     }
 
+    /** Show the flights that are about to leave in max 10 minutes from now when the Next Departures button is clicked
+     *
+     */
     private void buttonShowNextDepartures() {
         //we make a new list with only flights to be departed in the next 10 minutes
         List<List<String>> nextDepartureFlights = new ArrayList<>();
@@ -968,6 +1048,10 @@ public class MainController extends Main {
         dialog.show();
     }
 
+    /** Returns the number of flights about to depart in max the next 10 minutes
+     *
+     * @return nextDepartureFlights.size() which return the size of the newly constructed arraylist for this purpose
+     */
     private int next10MinDepartures() {
         //we make a new list with only flights to be departed in the next 10 minutes
         List<List<String>> nextDepartureFlights = new ArrayList<>();

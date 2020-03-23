@@ -15,6 +15,13 @@ public class PopUpHoldingFlights {
     private SimpleStringProperty planeType;
     private SimpleStringProperty firstContact;
 
+    /** Constructor of the class
+     *
+     * @param flightId the flight id
+     * @param flightType the type of the flight
+     * @param planeType the plane type
+     * @param firstContact the first time the flight "contacted" the flight agent
+     */
     public PopUpHoldingFlights(String flightId, String flightType, String planeType, String firstContact) {
         this.flightId = new SimpleStringProperty(flightId);
         this.flightType = new SimpleStringProperty(flightType);
@@ -51,7 +58,11 @@ public class PopUpHoldingFlights {
         firstContact.set(time);
     }
 
-
+    /** Makes the table that fills the popup with the right data
+     *
+     * @param flightLedger All our flights are stored here
+     * @return a table with the all the flights with status "Holding" in the flightLedger
+     */
     public static TableView<PopUpHoldingFlights> setHoldingFlightsForPopUp(List<List<String>> flightLedger) {
 
         TableView<PopUpHoldingFlights> table = new TableView<>();

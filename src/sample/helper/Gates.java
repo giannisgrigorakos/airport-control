@@ -1,7 +1,9 @@
 package sample.helper;
 
 
-
+/** Gates contain all the data of each gate
+ *
+ */
 public class Gates {
     //convention that of the above have all the options. When we encounter with an "-" string the type in not supported
      public String gateFlightType[] = {"passengers", "-", "-"};
@@ -66,4 +68,17 @@ public class Gates {
      public int longTermCurrentCapacity;
      public String longTermIdentifier;
      public int longTermCost;
+
+ /** Resets the current capacity of the gates
+  *
+  */
+ public void reset() {
+         this.gateCurrentCapacity = 0;
+         this.freightGateCurrentCapacity = 0;
+         this.zoneACurrentCapacity = 0;
+         this.zoneBCurrentCapacity = 0;
+         this.zoneCCurrentCapacity = 0;
+         this.generalCurrentCapacity = 0;
+         this.longTermCurrentCapacity = 0;
+     }
 }

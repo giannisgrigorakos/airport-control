@@ -14,6 +14,12 @@ public class PopUpNextDepartures {
     private SimpleStringProperty flightType;
     private SimpleStringProperty planeType;
 
+    /** Constructor of this class
+     *
+     * @param flightId the id of the flight
+     * @param flightType the type of the flight
+     * @param planeType the type of the plane
+     */
     public PopUpNextDepartures(String flightId, String flightType, String planeType) {
         this.flightId = new SimpleStringProperty(flightId);
         this.flightType = new SimpleStringProperty(flightType);
@@ -42,7 +48,11 @@ public class PopUpNextDepartures {
         planeType.set(pltype);
     }
 
-
+    /** Makes the table that fills the popup with the right data
+     *
+     * @param flightLedger Here we store all our flights
+     * @return the table with the flights that are about to depart max in the next 10 minutes
+     */
     public static TableView<PopUpNextDepartures> setNextDeparturesForPopUp(List<List<String>> flightLedger) {
 
         TableView<PopUpNextDepartures> table = new TableView<>();

@@ -14,6 +14,14 @@ public class PopUpGates {
     private SimpleStringProperty flightIds;
     private SimpleStringProperty departures;
 
+    /** Constructor tof this class
+     *
+     * @param gate the name of the gate
+     * @param gateId the gate id
+     * @param state the current state of the gate
+     * @param flightIds the ids of the flight that this gate hosts
+     * @param departures the departure times of the flights this gate hosts
+     */
     public PopUpGates(String gate, String gateId, String state, String flightIds, String departures) {
         this.gate = new SimpleStringProperty(gate);
         this.gateId = new SimpleStringProperty(gateId);
@@ -57,7 +65,17 @@ public class PopUpGates {
         departures.set(dps);
     }
 
-
+    /** Makes the table that fills the popup with the right data
+     *
+     * @param gate an array of strings for all the data of the gate
+     * @param freightGate an array of strings for all the data of the freight gate
+     * @param zoneA an array of strings for all the data of zone A
+     * @param zoneB an array of strings for all the data of zone B
+     * @param zoneC an array of strings for all the data of zone C
+     * @param general an array of strings for all the data of the general parking space
+     * @param longTerm an array of strings for all the data of the long term gate
+     * @return the table with the all the above data
+     */
     public static TableView<PopUpGates> setGatesForPopUp(String[] gate, String[] freightGate, String[] zoneA, String[] zoneB, String[] zoneC, String[] general, String[] longTerm) {
 
         TableView<PopUpGates> table = new TableView<>();

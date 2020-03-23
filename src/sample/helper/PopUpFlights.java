@@ -18,6 +18,16 @@ public class PopUpFlights {
     private SimpleStringProperty parkedWhere;
     private SimpleStringProperty departureTime;
 
+    /** Constructor of this class
+     *
+     * @param flightId the flight id
+     * @param cityOfDeparture the city of departure
+     * @param flightType the type of the flight
+     * @param planeType the plane type
+     * @param parkedWhere the parking spot of the flight e.g. G1
+     * @param currentState the current state of the flight
+     * @param departureTime the initial departure time
+     */
     public PopUpFlights(String flightId, String cityOfDeparture, String flightType, String planeType, String parkedWhere, String currentState, String departureTime) {
         this.flightId = new SimpleStringProperty(flightId);
         this.cityOfDeparture = new SimpleStringProperty(cityOfDeparture);
@@ -78,6 +88,11 @@ public class PopUpFlights {
         departureTime.set(time);
     }
 
+    /** Makes the table that fills the popup with the right data
+     *
+     * @param flightLedger All our flights are stored here
+     * @return a table with the all the flights in the flightLedger
+     */
     public static TableView<PopUpFlights> setFlightsForPopUp(List<List<String>> flightLedger) {
 
         TableView<PopUpFlights> table = new TableView<>();

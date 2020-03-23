@@ -23,7 +23,7 @@
             <Label fx:id="totalParkingSpaceLabel" alignment="CENTER" layoutX="284.0" layoutY="32.0" prefHeight="33.0" prefWidth="230.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Parking Space:" textFill="WHITE" />
             <Label fx:id="departingIn10MinutesLabel" alignment="CENTER" layoutX="123.0" layoutY="97.0" prefHeight="33.0" prefWidth="263.0" style="-fx-background-color: #0d47a1#0d47a1;" text="No. of Flights Departing in 10 next minutes: " textFill="WHITE" />
             <Label fx:id="revenueLabel" alignment="CENTER" layoutX="587.0" layoutY="32.0" prefHeight="33.0" prefWidth="140.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total Revenue: " textFill="WHITE" />
-            <Label fx:id="timerLabel" alignment="CENTER" layoutX="418.0" layoutY="97.0" prefHeight="33.0" prefWidth="245.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total TIme Ellapsed:" textFill="WHITE" />
+            <Label fx:id="timerLabel" alignment="CENTER" layoutX="418.0" layoutY="97.0" prefHeight="33.0" prefWidth="245.0" style="-fx-background-color: #0d47a1#0d47a1;" text="Total TIme Elapsed:" textFill="WHITE" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="27.0" layoutY="230.0" prefHeight="160.0" prefWidth="402.0" style="-fx-background-color: #ffffff;">
@@ -40,7 +40,8 @@
       <AnchorPane layoutX="27.0" layoutY="407.0" prefHeight="160.0" prefWidth="808.0" style="-fx-background-color: #ffffff;">
          <children>
             <Label fx:id="announcements" alignment="CENTER" layoutX="139.0" layoutY="14.0" prefHeight="33.0" prefWidth="531.0" style="-fx-background-color: #0d47a1#0d47a1;" text="This is a text area for messages about the flights" textFill="WHITE" />
-            <StackPane fx:id="stackPane" layoutX="-28.0" layoutY="-205.0" prefHeight="364.0" prefWidth="432.0" />
+            <StackPane fx:id="stackPane" layoutX="-28.0" layoutY="-291.0" prefHeight="450.0" prefWidth="433.0" />
+            <StackPane fx:id="errorStackPane" layoutX="2.0" layoutY="48.0" prefHeight="107.0" prefWidth="808.0" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="434.0" layoutY="230.0" prefHeight="160.0" prefWidth="402.0" style="-fx-background-color: #ffffff;">
